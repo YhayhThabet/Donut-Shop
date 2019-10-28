@@ -1,3 +1,13 @@
+/*
+@author Yhayh Thabet
+@assignment pp1008
+@semester Fall 2019
+@class COSC 311
+@professor Dr. Haynes
+@description This project is a simulation from a donut shop line. We need to figure out how many servers is needed
+			 to manage certain work loads.
+ */
+
 import java.util.*;
 
 public class simQueue {
@@ -23,10 +33,10 @@ public class simQueue {
 		for (int i = 0; i < 20; i++) { // Each loop is 1 tick.
 			int numCust = getPoissonRandom(2), aver; // Number of customers
 			
-			serversWork(servers, line);
-			addWaitTime(line);
-			addToLine(numCust, line);
-			aver = findValues(line);
+			serversWork(servers, line); // Adding customers to servers and releasing when done
+			addWaitTime(line); // Adding wait time to customers
+			addToLine(numCust, line); // Adding additional customers to queue
+			aver = findValues(line); // Finding min, max, total and average
 			
 			
 			System.out.println(inService + " Customers in service:");
@@ -36,7 +46,7 @@ public class simQueue {
 			System.out.println("Wait Time: " + minWaitTime + ", " + aver + ", " + maxWaitTime);
 			System.out.println("======================");
 			totalWait = 0;
-			decrementServerTime(servers);
+			decrementServiceTime(servers); // Decrements serviceTime
 		}
 
 	}
@@ -91,7 +101,7 @@ public class simQueue {
 			totalWait += c.waitTime;
 			line.add(c);
 		}
-		if(line.size() == 0)
+		if(line.size() == 0) // Finding average
             return 0;
         else {
             int avg = totalWait / line.size();
@@ -99,7 +109,7 @@ public class simQueue {
         }
 	}
 	
-	public static void decrementServerTime(LinkedList<Integer> servers) {
+	public static void decrementServiceTime(LinkedList<Integer> servers) {
 		for (int j = 0; j < servers.size(); j++) {
 			if (servers.get(j) != null) {
 				servers.set(j, servers.get(j) - 1); // Decrement service times
@@ -116,11 +126,12 @@ public class simQueue {
 		System.out.println("2. Low Demand \n >");
 		int choice = input.nextInt();
 
-		if (choice == 1) {
+		// Sending uniform value, mean and number of servers
+		if (choice == 1) { // Heavy Demand
 			heavyLow = 13;
 			meanT = 2;
 			return 7;
-		} else {
+		} else { // Low Demand
 			heavyLow = 4;
 			meanT = 0.25;
 			return 4;
