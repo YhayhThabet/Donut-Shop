@@ -130,11 +130,11 @@ public class simQueue {
 		if (choice == 1) { // Heavy Demand
 			heavyLow = 13;
 			meanT = 2;
-			return 7;
+			return 2;
 		} else { // Low Demand
 			heavyLow = 4;
 			meanT = 0.25;
-			return 4;
+			return 8;
 		}
 
 	}
