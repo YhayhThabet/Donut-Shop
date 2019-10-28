@@ -5,7 +5,7 @@ public class simQueue {
 	public static double meanT = 0;
 	public static int maxWaitTime = 0;
 	public static int minWaitTime = 0;
-	public static int aver = 0;
+	public static int totalWait = 0;
 	public static int inService = 0;
 	public static int completedService = 0;
 	public static int heavyLow = 0;
@@ -15,24 +15,27 @@ public class simQueue {
 		LinkedList<Integer> servers = new LinkedList<Integer>();
 
 		int numServers = displayMenu(); // Displays menu and gets number of servers
-
 		while (numServers > 0) { // Adds specific amount servers
 			servers.add(null);
 			numServers--;
 		}
 
 		for (int i = 0; i < 20; i++) { // Each loop is 1 tick.
-			int numCust = getPoissonRandom(2); // Number of customers
+			int numCust = getPoissonRandom(2), aver; // Number of customers
 			
 			serversWork(servers, line);
 			addWaitTime(line);
 			addToLine(numCust, line);
-			findValues(line);
+			aver = findValues(line);
 			
+			
+			System.out.println(inService + " Customers in service:");
+			System.out.println(completedService + " Customers with completed service:");
 			System.out.println(line.size() + " Customers in queue:");
-			System.out.println("Total Wait Time: " + aver);
-			System.out.println("Wait Time: " + minWaitTime + ", " + aver / line.size() + ", " + maxWaitTime);
+			System.out.println("Total Wait Time: " + totalWait);
+			System.out.println("Wait Time: " + minWaitTime + ", " + aver + ", " + maxWaitTime);
 			System.out.println("======================");
+			totalWait = 0;
 			decrementServerTime(servers);
 		}
 
@@ -40,14 +43,15 @@ public class simQueue {
 
 	public static int getPoissonRandom(double mean) { // Poisson random number generator
 		double L = Math.exp(-mean);
-		int k = 0;
-		double p = 1.0;
-		do {
-			p = p * r.nextDouble();
-			k++;
-		} while (p > L);
-		
-		return k - 1;
+		  double p = 1.0;
+		  int k = 0;
+
+		  do {
+		    k++;
+		    p *= Math.random();
+		  } while (p > L);
+
+		  return k - 1;
 
 	}
 	
@@ -55,12 +59,14 @@ public class simQueue {
 		for (int j = 0; j < servers.size(); j++) { // Releases a customer when done
 			if (line.isEmpty())
 				break;
-			else if (servers.get(j) == null) {
+			else if (servers.get(j) == null) { // Add customer to server
 				Customer c = line.remove();
 				servers.set(j, c.serviceTime);
-			} else if (servers.get(j) == 0) { // Remove customer and service time to servers
+				inService++;
+			} else if (servers.get(j) == 0) { // Add customer to server
 				Customer c = line.remove();
 				servers.set(j, c.serviceTime);
+				completedService++;
 			}
 		}
 	}
@@ -77,14 +83,20 @@ public class simQueue {
 		}
 	}
 	
-	public static void findValues(Queue<Customer> line) {
+	public static int findValues(Queue<Customer> line) {
 		for (int j = 0; j < line.size(); j++) { // Finds min, max, average
 			Customer c = line.remove();
 			max(c.waitTime);
 			min(c.waitTime);
-			aver += c.waitTime;
+			totalWait += c.waitTime;
 			line.add(c);
 		}
+		if(line.size() == 0)
+            return 0;
+        else {
+            int avg = totalWait / line.size();
+            return avg;
+        }
 	}
 	
 	public static void decrementServerTime(LinkedList<Integer> servers) {
